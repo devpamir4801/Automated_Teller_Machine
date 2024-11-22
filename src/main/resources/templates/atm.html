@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATM Interface</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+	body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f7f7f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.atm-container {
+  width: 400px;
+  background: #222;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.screen {
+  padding: 20px;
+  text-align: center;
+}
+
+.screen h2 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+input[type="number"] {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 10px;
+  background: #111;
+  font-size: 0.9rem;
+}
+	</style>
+	<script>let balance = 1000; // Initial balance
+let transactionHistory = [];
+
+function showScreen(action) {
+  const screenTitle = document.getElementById('screen-title');
+  const actionScreen = document.getElementById('action-screen');
+  const inputScreen = document.getElementById('input-screen');
+
+  // Switch screens based on the action
+  actionScreen.style.display = 'none';
+  inputScreen.style.display = 'block';
+
+  if (action === 'balance') {
+    screenTitle.innerText = `Your Balance: $${balance}`;
+    inputScreen.style.display = 'none'; // No input needed for balance check
+  } else if (action === 'deposit' || action === 'withdraw') {
+    screenTitle.innerText = action === 'deposit' ? 'Deposit Money' : 'Withdraw Money';
+    inputScreen.style.display = 'block';
+    inputScreen.setAttribute('data-action', action); // Save action type
+  } else if (action === 'history') {
+    const historyMessage = transactionHistory.length
+      ? transactionHistory.join('\n')
+      : 'No transactions yet.';
+    screenTitle.innerText = 'Transaction History';
+    alert(historyMessage);
+    goBack(); // Return to the main screen after showing history
+  }
+}
+
+function processTransaction() {
+  const inputScreen = document.getElementById('input-screen');
+  const amount = parseFloat(document.getElementById('amount-input').value);
+  const action = inputScreen.getAttribute('data-action');
+
+  if (isNaN(amount) || amount <= 0) {
+    alert('Please enter a valid amount.');
+    return;
+  }
+
+  if (action === 'deposit') {
+    balance += amount;
+    transactionHistory.push(`Deposited: $${amount}`);
+    alert(`Successfully deposited $${amount}. New balance: $${balance}`);
+  } else if (action === 'withdraw') {
+    if (amount > balance) {
+      alert('Insufficient balance!');
+    } else {
+      balance -= amount;
+      transactionHistory.push(`Withdrew: $${amount}`);
+      alert(`Successfully withdrew $${amount}. New balance: $${balance}`);
+    }
+  }
+
+  document.getElementById('amount-input').value = ''; // Clear input
+  goBack(); // Return to the main menu
+}
+
+function goBack() {
+  document.getElementById('screen-title').innerText = 'Welcome to ATM';
+  document.getElementById('action-screen').style.display = 'block';
+  document.getElementById('input-screen').style.display = 'none';
+}</script>
+<body>
+  <div class="atm-container">
+    <div class="screen">
+      <h2 id="screen-title">Welcome to ATM</h2>
+      <div id="action-screen">
+        <button onclick="showScreen('balance')">Check Balance</button>
+        <button onclick="showScreen('deposit')">Deposit</button>
+        <button onclick="showScreen('withdraw')">Withdraw</button>
+        <button onclick="showScreen('history')">Transaction History</button>
+      </div>
+      <div id="input-screen" style="display: none;">
+        <input type="number" id="amount-input" placeholder="Enter Amount" />
+        <button onclick="processTransaction()">Submit</button>
+        <button onclick="goBack()">Back</button>
+      </div>
+    </div>
+    <div class="footer">
+      <p>&copy; 2024 ATM Interface</p>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
